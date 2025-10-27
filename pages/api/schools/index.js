@@ -1,4 +1,4 @@
-import db from '../../../lib/db';
+import db, { executeQuery } from '../../../lib/db';
 import { IncomingForm } from 'formidable';
 import fs from 'fs';
 import path from 'path';
@@ -100,7 +100,8 @@ export default async function handler(req, res) {
           console.log('Query:', query);
           console.log('Values:', values);
 
-          const [result] = await db.query(query, values);
+          // Using the executeQuery helper function
+          const result = await executeQuery({ query, values });
           console.log('Insert Result:', result);
 
           return res.status(201).json({
