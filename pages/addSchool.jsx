@@ -22,33 +22,64 @@ const AddSchool = () => {
 
   const onSubmit = async (data) => {
     const formData = new FormData();
+    
+    // Log the received form data
+    console.log('Form data received:', {
+      ...data,
+      image: data.image?.[0]?.name || 'No image'
+    });
+    
     // Append all text fields
     Object.keys(data).forEach(key => {
-        if (key !== 'image') {
-            formData.append(key, data[key]);
-        }
+      if (key !== 'image') {
+        console.log(`Appending ${key}:`, data[key]);
+        formData.append(key, data[key]);
+      }
     });
+    
     // Append the file
     if (data.image && data.image.length > 0) {
-        formData.append('image', data.image[0]);
+      console.log('Appending image:', data.image[0].name);
+      formData.append('image', data.image[0]);
+    } else {
+      console.warn('No image file selected');
+    }
+    
+    // Log the FormData entries
+    console.log('FormData contents:');
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ':', pair[1] instanceof File ? pair[1].name : pair[1]);
     }
 
     try {
-      const response = await fetch('/api/schools', {
+      console.log('Submitting form data...');
+      
+      const response = await fetch('http://localhost:3000/api/schools', {
         method: 'POST',
-        body: formData, 
+        body: formData,
+        headers: {
+          // Don't set Content-Type header as it's automatically set with FormData
+          'Accept': 'application/json',
+        },
       });
 
-      if (response.ok) {
-        alert('School added successfully!');
-        reset(); 
-      } else {
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
         const errorData = await response.json();
-        alert(`Failed to add school: ${errorData.error}`);
+        console.error('Server error:', errorData);
+        throw new Error(errorData.error || `Server error: ${response.status}`);
       }
+
+      const result = await response.json();
+      console.log('Success:', result);
+      alert('School added successfully!');
+      reset();
+      
     } catch (error) {
       console.error('Submission Error:', error);
-      alert('An unexpected error occurred during submission.');
+      // Show more specific error message to the user
+      alert(error.message || 'An unexpected error occurred during submission. Please check the console for more details.');
     }
   };
 
