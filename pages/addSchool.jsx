@@ -54,7 +54,7 @@ const AddSchool = () => {
     try {
       console.log('Submitting form data...');
       
-      const response = await fetch('http://localhost:3000/api/schools', {
+      const response = await fetch('/api/schools', {
         method: 'POST',
         body: formData,
         headers: {
