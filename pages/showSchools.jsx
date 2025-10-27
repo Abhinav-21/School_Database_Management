@@ -14,8 +14,8 @@ const SchoolModal = ({ school, isOpen, onClose }) => {
             <Image 
               src={school.image} 
               alt={`${school.name} image`} 
-              layout="fill" 
-              objectFit="cover"
+              fill
+              className="object-cover"
             />
           ) : (
             <div className="h-full flex items-center justify-center">
@@ -135,8 +135,8 @@ const SchoolCard = ({ school, onClick }) => {
             <Image 
                 src={school.image} 
                 alt={`${school.name} image`} 
-                layout="fill" 
-                objectFit="cover" // Ensures image covers the area without distorting
+                fill
+                className="object-cover" // Ensures image covers the area without distorting
             />
         ) : (
             <span className="text-gray-400">No Image Available</span>
