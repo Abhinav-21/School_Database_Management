@@ -65,13 +65,31 @@ const AddSchool = () => {
 
       console.log('Response status:', response.status);
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Server error:', errorData);
-        throw new Error(errorData.error || `Server error: ${response.status}`);
+      // Log the raw response for debugging
+      const responseText = await response.text();
+      console.log('Raw response:', responseText);
+      
+      let errorData;
+      let result;
+      
+      try {
+        // Try to parse the response as JSON
+        const jsonData = JSON.parse(responseText);
+        if (!response.ok) {
+          errorData = jsonData;
+          console.error('Server error:', errorData);
+          throw new Error(errorData.error || `Server error: ${response.status}`);
+        }
+        result = jsonData;
+      } catch (parseError) {
+        console.error('Response parsing error:', parseError);
+        console.error('Non-JSON response received:', responseText);
+        throw new Error(
+          `Server returned invalid JSON. Status: ${response.status}. ` +
+          'This might be due to a server configuration issue.'
+        );
       }
-
-      const result = await response.json();
+      
       console.log('Success:', result);
       alert('School added successfully!');
       reset();

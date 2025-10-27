@@ -11,12 +11,40 @@ export const config = {
 };
 
 export default async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
+
+  // Handle preflight request
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   try {
+    console.log('API route handler started');
+    console.log('Request method:', req.method);
+    
     if (req.method === 'POST') {
       // --- POST: Add School Data (with Image Upload) ---
       try {
+        console.log('Setting up form parser');
+        // Ensure the upload directory exists
+        const uploadDir = path.join(process.cwd(), 'public', 'schoolImages');
+        try {
+          await fs.promises.mkdir(uploadDir, { recursive: true });
+        } catch (mkdirError) {
+          console.error('Error creating upload directory:', mkdirError);
+          return res.status(500).json({ error: 'Failed to create upload directory' });
+        }
+
         const form = new IncomingForm({
-          uploadDir: path.join(process.cwd(), 'public', 'schoolImages'), 
+          uploadDir: uploadDir,
           keepExtensions: true,
           maxFileSize: 5 * 1024 * 1024, // 5MB limit
           filename: (name, ext, part) => {
