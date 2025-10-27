@@ -133,7 +133,8 @@ export default async function handler(req, res) {
     } else if (req.method === 'GET') {
       // --- GET: Fetch Schools Data ---
       try {
-        const [rows] = await db.query('SELECT * FROM schools ORDER BY id DESC');
+        // Use the executeQuery helper to keep DB usage consistent (returns rows)
+        const rows = await executeQuery({ query: 'SELECT * FROM schools ORDER BY id DESC' });
         return res.status(200).json(rows);
       } catch (error) {
         console.error('SQL Error:', error);
